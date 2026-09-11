@@ -62,6 +62,10 @@ logs/
 .DS_Store
 Thumbs.db
 
+# Local config / logs
+.env
+frontend/logs.txt
+
 # Models (large files)
 models/*.pkl
 models/*.keras
