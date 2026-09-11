@@ -258,6 +258,66 @@ The dashboard will be available at `http://localhost:5173`
 - All 10 dashboard pages
 - API integration
 - Threat intelligence module
+
+## Deployment: Vercel + Render
+
+This project works well with a split deployment:
+
+- **Frontend** on **Vercel**
+- **Backend** on **Render**
+
+### Backend on Render
+
+Use these settings:
+
+- **Root directory**: `backend`
+- **Build command**: `pip install -r requirements.txt`
+- **Start command**: `gunicorn -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT`
+
+Environment variables:
+
+```bash
+DEBUG=False
+DATABASE_URL=sqlite:///./backend/database/advsecure.db
+XGBOOST_MODEL_PATH=./models/base_xgboost.pkl
+DNN_MODEL_PATH=./models/base_dnn.keras
+SCALER_PATH=./models/scaler.pkl
+LOG_LEVEL=INFO
+LOG_FILE=./backend/logs/advsecure.log
+CORS_ORIGINS=https://your-vercel-app.vercel.app
+```
+
+If you use more than one frontend domain, separate them with commas:
+
+```bash
+CORS_ORIGINS=https://your-vercel-app.vercel.app,https://www.yourdomain.com
+```
+
+### Frontend on Vercel
+
+Use these settings:
+
+- **Root directory**: `frontend`
+- **Build command**: `npm run build`
+- **Output directory**: `dist`
+
+Environment variable:
+
+```bash
+VITE_API_BASE_URL=https://your-render-service.onrender.com/api
+```
+
+### Why this setup is safe
+
+- The frontend calls the backend via a full API URL instead of a local dev proxy.
+- The backend only allows requests from the Vercel origin(s) you specify.
+- The app still keeps `/api` as the local default for development.
+
+### Deployment notes
+
+- Keep model files in `backend/models/` so Render can load them.
+- Use persistent storage or a managed database if you need durable SQLite data.
+- Do not use `npm run dev` in production.
 - Adversarial attack simulation
 - Audit logging system
 - Comprehensive UI with Tailwind CSS

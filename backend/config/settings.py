@@ -31,7 +31,12 @@ class Settings:
     FEATURE_SIZE = 52
     
     # CORS
+    _cors_env = os.getenv("CORS_ORIGINS", "")
     CORS_ORIGINS = [
+        origin.strip()
+        for origin in _cors_env.split(",")
+        if origin.strip()
+    ] or [
         "http://localhost",
         "http://localhost:3000",
         "http://localhost:5173",
